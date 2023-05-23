@@ -1,5 +1,5 @@
 <template>
-<!-- ThreeJS 各种材质 -->
+<!-- ThreeJS pbr -->
   <div class="three-wp" ref="threeWp"></div>
 </template>
 <script lang="ts" setup>
@@ -20,7 +20,7 @@ onMounted(() => {
   scene = new THREE.Scene()
   // 创建透视相机
   perspectiveCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
-  perspectiveCamera.position.z = 2.4
+  perspectiveCamera.position.z = 5
   // 创建渲染器
   renderer = new THREE.WebGLRenderer()
   renderer.setSize(window.innerWidth, window.innerHeight)
@@ -35,7 +35,7 @@ onMounted(() => {
   scene.add(axesHelper)
   /************************** START ******************************/
 
-  const boxGeometry = new THREE.BoxGeometry(2, 2, 2)
+  const boxGeometry = new THREE.SphereGeometry(2, 32, 64)
   // 纹理加载
   const textureLoader = new THREE.TextureLoader()
   // 颜色贴图
@@ -44,26 +44,34 @@ onMounted(() => {
   const aoTexture = textureLoader.load('/textures/WallMedieval003/WallMedieval003_AO_3K.jpg')
   // ao贴图需要第二组uv
   boxGeometry.setAttribute('uv2', new THREE.BufferAttribute(boxGeometry.attributes.uv.array, 2))
+  // 置换贴图
+  const displacementTexture = textureLoader.load('/textures/WallMedieval003/WallMedieval003_DISP_VAR2_3K.jpg')
   // stoneColorTexture.offset.set(0.9, 0.9)
   // stoneColorTexture.rotation = Math.PI / 2
   // stoneColorTexture.wrapS = THREE.RepeatWrapping
   // stoneColorTexture.wrapT = THREE.RepeatWrapping
   // console.log(stoneColorTexture)
-  const basicMaterial = new THREE.MeshBasicMaterial({
+  const standardMaterial = new THREE.MeshStandardMaterial({
     map: stoneColorTexture,
     transparent: true,
     aoMap: aoTexture,
     aoMapIntensity: 3,
+    displacementMap: displacementTexture,
+    displacementScale: 0.1
   })
 
-  const mesh = new THREE.Mesh(boxGeometry, basicMaterial)
+  const mesh = new THREE.Mesh(boxGeometry, standardMaterial)
   scene.add(mesh)
   /**************************  END  ******************************/
 
 
   // 设置环境光
-  // const ambientLight = new THREE.AmbientLight(0x404040)
-  // scene.add(ambientLight)
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.1)
+  scene.add(ambientLight)
+  // 平行光
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.7)
+  directionalLight.position.set(5, 5, 0)
+  scene.add(directionalLight)
 
   render()
   window.addEventListener('resize', onWindowResize)
