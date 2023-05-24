@@ -4,7 +4,8 @@
 <!--  <Three03></Three03>-->
 <!--  <Three04></Three04>-->
 <!--  <Three05></Three05>-->
-  <Three06></Three06>
+<!--  <Three06></Three06>-->
+  <Three07></Three07>
 </template>
 
 <script lang="ts" setup>
@@ -20,4 +21,6 @@ import Three04 from '@/pages/three04.vue'
 // import Three05 from '@/pages/three05.vue'
 // ThreeJs 环境贴图
 import Three06 from '@/pages/three06.vue'
+// ThreeJs 环境贴图2
+import Three07 from '@/pages/three07.vue'
 </script>
