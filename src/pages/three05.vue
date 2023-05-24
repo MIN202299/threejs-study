@@ -20,7 +20,7 @@ onMounted(() => {
   scene = new THREE.Scene()
   // 创建透视相机
   perspectiveCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
-  perspectiveCamera.position.z = 5
+  perspectiveCamera.position.z = 3
   // 创建渲染器
   renderer = new THREE.WebGLRenderer()
   renderer.setSize(window.innerWidth, window.innerHeight)
@@ -35,9 +35,11 @@ onMounted(() => {
   scene.add(axesHelper)
   /************************** START ******************************/
 
-  const boxGeometry = new THREE.SphereGeometry(2, 32, 64)
+  const boxGeometry = new THREE.PlaneGeometry(5, 2, 200, 100)
+  // 设置纹理加载器
+  const loadManager = new THREE.LoadingManager(onLoad, onProgress, onError)
   // 纹理加载
-  const textureLoader = new THREE.TextureLoader()
+  const textureLoader = new THREE.TextureLoader(loadManager)
   // 颜色贴图
   const stoneColorTexture = textureLoader.load('/textures/WallMedieval003/WallMedieval003_COL_VAR1_3K.jpg')
   // Ao环境贴图
@@ -46,6 +48,10 @@ onMounted(() => {
   boxGeometry.setAttribute('uv2', new THREE.BufferAttribute(boxGeometry.attributes.uv.array, 2))
   // 置换贴图
   const displacementTexture = textureLoader.load('/textures/WallMedieval003/WallMedieval003_DISP_VAR2_3K.jpg')
+  // 法线贴图
+  const normalTexture = textureLoader.load('/textures/WallMedieval003/WallMedieval003_NRM_3K.jpg')
+  // 粗糙度贴图
+  const roughnessTexture = textureLoader.load('/textures/WallMedieval003/WallMedieval003_REFL_3K.jpg')
   // stoneColorTexture.offset.set(0.9, 0.9)
   // stoneColorTexture.rotation = Math.PI / 2
   // stoneColorTexture.wrapS = THREE.RepeatWrapping
@@ -55,13 +61,19 @@ onMounted(() => {
     map: stoneColorTexture,
     transparent: true,
     aoMap: aoTexture,
-    aoMapIntensity: 3,
+    aoMapIntensity: 15,
     displacementMap: displacementTexture,
-    displacementScale: 0.1
+    displacementScale: 0.1,
+    normalMap: normalTexture,
+    roughnessMap: roughnessTexture,
+    roughness: 0.1,
+    // wireframe: true
   })
 
   const mesh = new THREE.Mesh(boxGeometry, standardMaterial)
   scene.add(mesh)
+
+
   /**************************  END  ******************************/
 
 
@@ -70,7 +82,7 @@ onMounted(() => {
   scene.add(ambientLight)
   // 平行光
   const directionalLight = new THREE.DirectionalLight(0xffffff, 0.7)
-  directionalLight.position.set(5, 5, 0)
+  directionalLight.position.set(0, 0, 5)
   scene.add(directionalLight)
 
   render()
@@ -108,6 +120,16 @@ function toggleFullscreen() {
   } else {
     canvas.requestFullscreen()
   }
+}
+// 纹理加载
+function onProgress(e, itemsLoaded, itemsTotal) {
+  console.log('正在加载', e, itemsLoaded, itemsTotal)
+}
+function onLoad(e) {
+  console.log('加载完成', e)
+}
+function onError(e) {
+  console.log('加载出错', e)
 }
 
 </script>
